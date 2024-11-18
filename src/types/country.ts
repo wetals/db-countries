@@ -18,4 +18,6 @@ export interface Country {
   borders: string[];
   area: number;
   timezones: string[];
+  flag?: string;
+  favorite?: boolean;
 }

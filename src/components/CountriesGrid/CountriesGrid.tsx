@@ -1,66 +1,17 @@
-import { Country } from "@/types/country";
-import type { ColDef, GridApi, GridReadyEvent } from "ag-grid-community";
+import { useCountries } from "@/hooks/useCountries";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
+import { getColumnDefs } from "./GridColumns";
 
-interface CountriesGridProps {
-  countries: Country[];
-  favorites: string[];
-  onToggleFavorite: (countryName: string) => void;
-  showFavorites: boolean;
-}
+const paginationOptions = [10, 20, 50];
 
-export const CountriesGrid = ({ countries }: CountriesGridProps) => {
-  let gridApi: GridApi | null = null;
+export const CountriesGrid = () => {
+  const { countries, isLoading, error } = useCountries();
 
-  const columnDefs = useMemo<ColDef[]>(
-    () => [
-      {
-        field: "flag",
-        headerName: "Flag",
-        width: 80,
-      },
-      {
-        field: "name.common",
-        headerName: "Name",
-        flex: 1,
-      },
-      {
-        field: "capital",
-        headerName: "Capital",
-        flex: 1,
-      },
-      {
-        field: "population",
-        headerName: "Population",
-        type: "numericColumn",
-        flex: 1,
-      },
-      {
-        field: "languages",
-        headerName: "Languages",
-        flex: 1,
-      },
-      {
-        field: "region",
-        headerName: "Region",
-        flex: 1,
-      },
-      {
-        field: "currencies",
-        headerName: "Currencies",
-        flex: 1,
-      },
-      {
-        headerName: "Favorite",
-        width: 100,
-      },
-    ],
-    []
-  );
-
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    gridApi = params.api;
+  const columnDefs = useMemo(() => {
+    return getColumnDefs();
   }, []);
 
   const defaultColDef = useMemo(
@@ -68,19 +19,34 @@ export const CountriesGrid = ({ countries }: CountriesGridProps) => {
       sortable: true,
       filter: true,
       resizable: true,
+      minWidth: 100,
     }),
     []
   );
 
+  if (error) {
+    return (
+      <div className="error-container">Error loading countries: {error}</div>
+    );
+  }
+
+  if (isLoading) {
+    return <div>Loading countries...</div>;
+  }
+
   return (
     <div className="ag-theme-alpine w-full h-[600px]">
       <AgGridReact
-        rowData={countries}
         columnDefs={columnDefs}
+        rowData={countries}
         defaultColDef={defaultColDef}
-        onGridReady={onGridReady}
-        detailRowHeight={300}
-        detailRowAutoHeight={true}
+        rowHeight={48}
+        pagination
+        paginationPageSize={20}
+        paginationPageSizeSelector={paginationOptions}
+        masterDetail
+        detailRowAutoHeight
+        domLayout="autoHeight"
       />
     </div>
   );
