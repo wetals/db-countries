@@ -10,6 +10,12 @@ npm install
 npm run dev
 ```
 
+## UX
+
+![alt text](https://github.com/wetals/db-countries/blob/main/ux_design.png?raw=true)
+
+https://app.eraser.io/workspace/HhZWW8GbPaaVwrf6EAQJ?origin=share
+
 ### Requirements
 
 1. Build the frontend of the application using React ✅
