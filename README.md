@@ -10,6 +10,10 @@ npm install
 npm run dev
 ```
 
+## Localhost
+
+[`http://localhost:5173`](http://localhost:5173)
+
 ## UX
 
 ![alt text](https://github.com/wetals/db-countries/blob/main/ux_design.png?raw=true)
