@@ -7,7 +7,15 @@ import {
 import { Star } from "lucide-react";
 import { Country } from "@/types/country";
 
-export const getColumnDefs = (): ColDef<Country>[] => {
+interface GridColumnsProps {
+  onFavoriteToggle: (countryName: string) => void;
+  isFavorite: (countryName: string) => boolean;
+}
+
+export const getColumnDefs = ({
+  onFavoriteToggle,
+  isFavorite,
+}: GridColumnsProps): ColDef<Country>[] => {
   return [
     {
       field: "flag",
@@ -112,10 +120,29 @@ export const getColumnDefs = (): ColDef<Country>[] => {
       width: 100,
       sortable: false,
       filter: false,
-      cellRenderer: () => {
+      cellRenderer: (params: ICellRendererParams<Country>) => {
+        const countryName = params.data?.name.common || "";
+        const starred = isFavorite(countryName);
+
+        if (starred) {
+          console.log("===> starred: ", starred);
+        }
+
         return (
-          <button className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400">
-            <Star className={`w-5 h-5`} />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onFavoriteToggle(countryName);
+              params.api.refreshCells({
+                force: true,
+                rowNodes: [params.node],
+                columns: ["favorite"],
+              });
+            }}
+            className={`p-2 rounded-full hover:bg-gray-100 transition-colors
+              ${starred ? "text-yellow-500" : "text-gray-400"}`}
+          >
+            <Star className={`w-5 h-5 ${starred ? "fill-current" : ""}`} />
           </button>
         );
       },

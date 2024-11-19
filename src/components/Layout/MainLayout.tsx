@@ -1,15 +1,38 @@
 import { CountriesGrid } from "@/components/CountriesGrid/CountriesGrid";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { ViewToggle } from "@/components/ViewToggle/ViewToggle";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useCountries } from "@/hooks/useCountries";
 
 export const MainLayout = () => {
-  const [showFavorites, setShowFavorites] = useState(false);
-  const [searchQuery] = useState("");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleViewToggle = (showFavorites: boolean) => {
-    setShowFavorites(showFavorites);
-  };
+  const { countries } = useCountries();
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+
+  const handleViewToggle = useCallback((showFavorites: boolean) => {
+    setShowFavoritesOnly(showFavorites);
+    setSearchQuery("");
+  }, []);
+
+  const counts = useMemo(
+    () => ({
+      total: countries?.length ?? 0,
+      favorites: favorites.length,
+    }),
+    [countries, favorites]
+  );
+
+  console.log("1. ===> counts: ", counts);
+
+  const handleFavoriteToggle = useCallback(
+    (countryName: string) => {
+      toggleFavorite(countryName);
+    },
+    [toggleFavorite]
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -22,14 +45,20 @@ export const MainLayout = () => {
           </div>
 
           <ViewToggle
-            showFavorites={showFavorites}
-            onChange={handleViewToggle}
+            showFavoritesOnly={showFavoritesOnly}
+            onToggle={handleViewToggle}
+            favoritesCount={counts.favorites}
+            totalCount={counts.total}
           />
         </div>
       </header>
 
       <main className="p-4">
-        <CountriesGrid />
+        <CountriesGrid
+          showFavoritesOnly={showFavoritesOnly}
+          onFavoriteToggle={handleFavoriteToggle}
+          isFavorite={isFavorite}
+        />
       </main>
     </div>
   );
