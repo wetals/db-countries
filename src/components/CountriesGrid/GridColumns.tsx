@@ -4,7 +4,7 @@ import {
   ValueGetterParams,
   ValueFormatterParams,
 } from "ag-grid-community";
-import { Star } from "lucide-react";
+import { Star, ChevronRight } from "lucide-react";
 import { Country } from "@/types/country";
 
 interface GridColumnsProps {
@@ -17,6 +17,33 @@ export const getColumnDefs = ({
   isFavorite,
 }: GridColumnsProps): ColDef<Country>[] => {
   return [
+    {
+      headerName: "",
+      width: 50,
+      cellRenderer: (params: ICellRendererParams<Country>) => {
+        const expanded = params.node.expanded;
+        return (
+          <button
+            className="flex items-center justify-center w-full h-full"
+            onClick={() => {
+              // console.log("2. ===> params: ", params);
+
+              if (expanded) {
+                params.node.setExpanded(false);
+              } else {
+                params.node.setExpanded(true);
+              }
+            }}
+          >
+            <ChevronRight
+              className={`w-5 h-5 ${expanded ? "rotate-90" : ""}`}
+            />
+          </button>
+        );
+      },
+      sortable: false,
+      filter: false,
+    },
     {
       field: "flag",
       headerName: "Flag",
@@ -123,10 +150,6 @@ export const getColumnDefs = ({
       cellRenderer: (params: ICellRendererParams<Country>) => {
         const countryName = params.data?.name.common || "";
         const starred = isFavorite(countryName);
-
-        if (starred) {
-          console.log("===> starred: ", starred);
-        }
 
         return (
           <button

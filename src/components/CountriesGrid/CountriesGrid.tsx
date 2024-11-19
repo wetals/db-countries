@@ -1,8 +1,10 @@
 import { useCountries } from "@/hooks/useCountries";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
+import { CountryDetails } from "./CountryDetails";
 import { getColumnDefs } from "./GridColumns";
 
 const paginationOptions = [10, 20, 50];
@@ -39,12 +41,15 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
     []
   );
 
+  const DetailCellRenderer = useCallback((props: any) => {
+    const countryData = props.data;
+    return <CountryDetails {...countryData} />;
+  }, []);
+
   const filteredCountries = useMemo(() => {
     if (!countries) return [];
 
     let filtered = countries;
-
-    console.log("3. ===> countries: ", countries);
 
     if (showFavoritesOnly) {
       filtered = filtered.filter((country) => isFavorite(country.name.common));
@@ -74,9 +79,9 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
         paginationPageSize={20}
         paginationPageSizeSelector={paginationOptions}
         masterDetail
-        detailRowAutoHeight
-        domLayout="autoHeight"
         quickFilterText={quickFilterText}
+        detailCellRenderer={DetailCellRenderer}
+        domLayout="autoHeight"
         overlayNoRowsTemplate={
           showFavoritesOnly
             ? "<span>No favorite countries added yet</span>"

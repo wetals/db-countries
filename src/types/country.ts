@@ -20,4 +20,8 @@ export interface Country {
   timezones: string[];
   flag?: string;
   favorite?: boolean;
+  rowIndex?: string;
+  car?: {
+    side?: string;
+  };
 }
