@@ -11,12 +11,14 @@ interface CountriesGridProps {
   showFavoritesOnly: boolean;
   onFavoriteToggle: (countryName: string) => void;
   isFavorite: (countryName: string) => boolean;
+  quickFilterText?: string;
 }
 
 export const CountriesGrid: React.FC<CountriesGridProps> = ({
   showFavoritesOnly,
   onFavoriteToggle,
   isFavorite,
+  quickFilterText,
 }) => {
   const { countries, isLoading, error } = useCountries();
 
@@ -74,6 +76,12 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
         masterDetail
         detailRowAutoHeight
         domLayout="autoHeight"
+        quickFilterText={quickFilterText}
+        overlayNoRowsTemplate={
+          showFavoritesOnly
+            ? "<span>No favorite countries added yet</span>"
+            : "<span>No results found</span>"
+        }
       />
     </div>
   );

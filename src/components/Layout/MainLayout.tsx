@@ -1,20 +1,25 @@
 import { CountriesGrid } from "@/components/CountriesGrid/CountriesGrid";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { ViewToggle } from "@/components/ViewToggle/ViewToggle";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, type ChangeEvent } from "react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useCountries } from "@/hooks/useCountries";
 
 export const MainLayout = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [quickFilterText, setQuickFilterText] = useState<string>();
+
+  const onFilterTextBoxChanged = useCallback(
+    ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
+      setQuickFilterText(value),
+    []
+  );
 
   const { countries } = useCountries();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
 
   const handleViewToggle = useCallback((showFavorites: boolean) => {
     setShowFavoritesOnly(showFavorites);
-    setSearchQuery("");
   }, []);
 
   const counts = useMemo(
@@ -41,7 +46,10 @@ export const MainLayout = () => {
 
         <div className="flex justify-between items-center gap-4">
           <div className="flex-grow">
-            <SearchBar value={searchQuery} placeholder="Search countries..." />
+            <SearchBar
+              onFilterTextBoxChanged={onFilterTextBoxChanged}
+              placeholder="Search countries..."
+            />
           </div>
 
           <ViewToggle
@@ -58,6 +66,7 @@ export const MainLayout = () => {
           showFavoritesOnly={showFavoritesOnly}
           onFavoriteToggle={handleFavoriteToggle}
           isFavorite={isFavorite}
+          quickFilterText={quickFilterText}
         />
       </main>
     </div>
